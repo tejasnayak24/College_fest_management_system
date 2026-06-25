@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,12 +13,41 @@ enum Role {
   COORDINATOR
 }
 
+enum EventCategory {
+  TECHNICAL
+  CULTURAL
+  SPORTS
+  WORKSHOP
+  OTHER
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
   password  String
   role      Role     @default(STUDENT)
+
+  events    Event[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id                  String          @id @default(cuid())
+  title               String
+  description         String
+  venue               String
+  eventDate           DateTime
+  registrationDeadline DateTime
+  maxParticipants     Int
+  fee                 Float           @default(0)
+  category            EventCategory
+
+  organizerId         String
+  organizer           User            @relation(fields: [organizerId], references: [id])
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 }
