@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import {
   createEvent,
   getAllEvents,
+  deleteEvent,
 } from "@/services/admin.service";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -58,9 +59,23 @@ export default function AdminPage() {
       await fetchEvents();
     } catch (err: any) {
       console.error(err.response?.data);
-      alert(
-        err.response?.data?.message || "Failed to create event"
-      );
+      alert(err.response?.data?.message || "Failed to create event");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this event?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteEvent(id);
+      await fetchEvents();
+      alert("Event deleted successfully");
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Delete failed");
     }
   };
 
@@ -69,9 +84,7 @@ export default function AdminPage() {
       <DashboardLayout>
         <div className="space-y-10">
           <div className="max-w-2xl space-y-4">
-            <h1 className="text-3xl font-bold">
-              Create Event
-            </h1>
+            <h1 className="text-3xl font-bold">Create Event</h1>
 
             <Input
               placeholder="Title"
@@ -185,9 +198,7 @@ export default function AdminPage() {
                     <th className="p-4 text-left">Date</th>
                     <th className="p-4 text-left">Category</th>
                     <th className="p-4 text-left">Fee</th>
-                    <th className="p-4 text-center">
-                      Actions
-                    </th>
+                    <th className="p-4 text-center">Actions</th>
                   </tr>
                 </thead>
 
@@ -207,23 +218,15 @@ export default function AdminPage() {
                         key={event.id}
                         className="border-t"
                       >
-                        <td className="p-4">
-                          {event.title}
-                        </td>
+                        <td className="p-4">{event.title}</td>
+
+                        <td className="p-4">{event.venue}</td>
 
                         <td className="p-4">
-                          {event.venue}
+                          {new Date(event.eventDate).toLocaleDateString()}
                         </td>
 
-                        <td className="p-4">
-                          {new Date(
-                            event.eventDate
-                          ).toLocaleDateString()}
-                        </td>
-
-                        <td className="p-4">
-                          {event.category}
-                        </td>
+                        <td className="p-4">{event.category}</td>
 
                         <td className="p-4">
                           ₹{event.fee}
@@ -231,12 +234,20 @@ export default function AdminPage() {
 
                         <td className="p-4">
                           <div className="flex justify-center gap-4">
-                            <button>
-                              <Pencil className="h-5 w-5 cursor-pointer text-blue-600" />
+                            <button
+                              onClick={() =>
+                                alert("Edit feature coming next!")
+                              }
+                            >
+                              <Pencil className="h-5 w-5 cursor-pointer text-blue-600 hover:text-blue-800" />
                             </button>
 
-                            <button>
-                              <Trash2 className="h-5 w-5 cursor-pointer text-red-600" />
+                            <button
+                              onClick={() =>
+                                handleDelete(event.id)
+                              }
+                            >
+                              <Trash2 className="h-5 w-5 cursor-pointer text-red-600 hover:text-red-800" />
                             </button>
                           </div>
                         </td>
