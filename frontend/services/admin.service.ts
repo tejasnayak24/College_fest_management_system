@@ -1,5 +1,10 @@
 import api from "@/lib/api";
 
+export const getAllEvents = async () => {
+  const response = await api.get("/events");
+  return response.data;
+};
+
 export const createEvent = async (data: any) => {
   const response = await api.post("/events", data);
   return response.data;
