@@ -1,7 +1,13 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import StatCard from "@/components/dashboard/StatCard";
 import UpcomingEvents from "@/components/dashboard/UpcomingEvents";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
+import { getCurrentUser } from "@/services/auth.service";
 
 import {
   CalendarDays,
@@ -10,18 +16,43 @@ import {
   Clock,
 } from "lucide-react";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 export default function DashboardPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await getCurrentUser();
+        setUser(response.user);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   return (
     <ProtectedRoute>
       <DashboardLayout>
         <div className="space-y-8">
           <div>
             <h1 className="text-3xl font-bold">
-              Welcome back, Tejas 👋
+              Welcome back, {loading ? "Loading..." : user?.name || "User"} 👋
             </h1>
 
             <p className="mt-2 text-gray-500">
-              Here's what's happening in your college fest.
+              Welcome to your FestSphere dashboard.
             </p>
           </div>
 
