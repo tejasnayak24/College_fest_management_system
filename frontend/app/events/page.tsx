@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { getAllEvents } from "@/services/event.service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { registerForEvent } from "@/services/registration.service";
 
 interface Event {
   id: string;
@@ -20,6 +21,7 @@ interface Event {
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [registering, setRegistering] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -35,6 +37,23 @@ export default function EventsPage() {
 
     fetchEvents();
   }, []);
+  const handleRegister = async (eventId: string) => {
+  try {
+    setRegistering(eventId);
+
+    await registerForEvent(eventId);
+
+    alert("Successfully registered!");
+
+  } catch (err: any) {
+    alert(
+      err.response?.data?.message ||
+      "Registration failed"
+    );
+  } finally {
+    setRegistering(null);
+  }
+};
 
   return (
     <ProtectedRoute>
@@ -76,8 +95,12 @@ export default function EventsPage() {
                       <strong>Fee:</strong> ₹{event.fee}
                     </p>
 
-                    <Button className="w-full">
-                      Register
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleRegister(event.id)}
+                      disabled={registering === event.id}
+                    >
+                      {registering === event.id ? "Registering..." : "Register"}
                     </Button>
                   </CardContent>
                 </Card>
