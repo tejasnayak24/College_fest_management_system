@@ -1,5 +1,5 @@
 "use client";
-
+import AdminRoute from "@/components/auth/AdminRoute";
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -124,6 +124,7 @@ export default function AdminPage() {
 
  return (
   <ProtectedRoute>
+  <AdminRoute>
     <DashboardLayout>
       <div className="space-y-10">
 
@@ -343,6 +344,7 @@ export default function AdminPage() {
         </div>
       </div>
     </DashboardLayout>
-  </ProtectedRoute>
+    </AdminRoute>
+</ProtectedRoute>
 );
 }
