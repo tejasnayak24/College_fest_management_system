@@ -9,6 +9,6 @@ export const registerForEvent = async (eventId: string) => {
 };
 
 export const getMyRegistrations = async () => {
-  const response = await api.get("/registrations/me");
+  const response = await api.get("/registrations/my");
   return response.data;
 };

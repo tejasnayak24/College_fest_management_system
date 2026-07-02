@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -11,47 +12,73 @@ import {
   LogOut,
 } from "lucide-react";
 
-const menuItems = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Events",
-    href: "/events",
-    icon: CalendarDays,
-  },
-  {
-    title: "My Registrations",
-    href: "/registrations",
-    icon: Ticket,
-  },
-  {
-    title: "Profile",
-    href: "/profile",
-    icon: User,
-  },
-  {
-    title: "Admin",
-    href: "/admin",
-    icon: Shield,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
-];
+import { getCurrentUser } from "@/services/auth.service";
 
 export default function Sidebar() {
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await getCurrentUser();
+        setRole(response.user.role);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const menuItems = [
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Events",
+      href: "/events",
+      icon: CalendarDays,
+    },
+    {
+      title: "My Registrations",
+      href: "/registrations",
+      icon: Ticket,
+    },
+    {
+      title: "Profile",
+      href: "/profile",
+      icon: User,
+    },
+    ...(role === "ADMIN"
+      ? [
+          {
+            title: "Admin",
+            href: "/admin",
+            icon: Shield,
+          },
+        ]
+      : []),
+    {
+      title: "Settings",
+      href: "/settings",
+      icon: Settings,
+    },
+  ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+
   return (
-    <aside className="w-64 h-screen border-r bg-white p-5">
-      <h1 className="text-2xl font-bold text-blue-600 mb-10">
+    <aside className="flex h-screen w-64 flex-col border-r bg-white p-5">
+      <h1 className="mb-10 text-2xl font-bold text-blue-600">
         FestSphere
       </h1>
 
-      <nav className="space-y-2">
+      <nav className="flex-1 space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
 
@@ -59,7 +86,7 @@ export default function Sidebar() {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center gap-3 rounded-lg px-4 py-3 hover:bg-slate-100 transition"
+              className="flex items-center gap-3 rounded-lg px-4 py-3 transition hover:bg-slate-100"
             >
               <Icon size={20} />
               <span>{item.title}</span>
@@ -68,12 +95,13 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="absolute bottom-8">
-        <button className="flex items-center gap-3 text-red-500 hover:text-red-600">
-          <LogOut size={20} />
-          Logout
-        </button>
-      </div>
+      <button
+        onClick={handleLogout}
+        className="mt-auto flex items-center gap-3 rounded-lg px-4 py-3 text-red-500 transition hover:bg-red-50 hover:text-red-600"
+      >
+        <LogOut size={20} />
+        Logout
+      </button>
     </aside>
   );
 }
